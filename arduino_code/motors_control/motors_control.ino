@@ -1,3 +1,13 @@
+#include <ros.h>
+#include <std_msgs/String.h>
+
+ros::NodeHandle rh;
+
+std_msgs::String str_msg;
+ros::Publisher chatter("chatter", &str_msg);
+
+char hello[13] = "Hello, ROS from arduino!";
+
 int FRONT_RIGHT_DIRECTION_1_PIN = 4;
 int FRONT_LEFT_DIRECTION_1_PIN = 7;
 int REAR_RIGHT_DIRECTION_1_PIN = 3;
@@ -11,6 +21,9 @@ int REAR_LEFT_DIRECTION_2_PIN = 9;
 void controlMotorDirection(int in1, int in2, int direction);
 
 void setup() {
+  nh.initNode();
+  nh.advertise(chatter);
+
   Serial.begin(9600);
   pinMode(FRONT_RIGHT_DIRECTION_1_PIN, OUTPUT);
   pinMode(FRONT_LEFT_DIRECTION_1_PIN, OUTPUT);
@@ -43,6 +56,10 @@ void loop() {
   controlMotorDirection(REAR_RIGHT_DIRECTION_1_PIN, REAR_RIGHT_DIRECTION_2_PIN, 0);
   controlMotorDirection(REAR_LEFT_DIRECTION_1_PIN, REAR_LEFT_DIRECTION_2_PIN, 0);
   delay(500);  // wait for 500ms
+
+  str_msg.data = hello;
+  chatter.publish(&str_msg);
+  nh.spinOnce();
 }
 
 void controlMotorDirection(int in1, int in2, int direction) {
